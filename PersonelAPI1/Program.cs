@@ -10,7 +10,7 @@ namespace PersonelAPI1
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddDbContext<PersonelDbContext>(options =>
+            builder.Services.AddDbContext<EmployeeDbContext>(options =>
              options.UseSqlServer(builder.Configuration.GetConnectionString("PersonelDb")));
             // Add services to the container.
 
