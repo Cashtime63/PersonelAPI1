@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace PersonelAPI1.Controllers
 {
@@ -17,11 +14,10 @@ namespace PersonelAPI1.Controllers
             _context = context;
         }
 
-        // GET: api/Employee
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Personel>>> GetEmployees()
+        public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
-            return await _context.Personeller
+            return await _context.Employees
                 .Include(p => p.BankInfo)
                 .Include(p => p.AnnualLeaves)
                     .ThenInclude(y => y.UsedLeaveDays)
@@ -32,11 +28,10 @@ namespace PersonelAPI1.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Employee/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Personel>> GetEmployee(int id)
+        public async Task<ActionResult<Employee>> GetEmployee(int id)
         {
-            var employee = await _context.Personeller
+            var employee = await _context.Employees
                 .Include(p => p.BankInfo)
                 .Include(p => p.AnnualLeaves)
                     .ThenInclude(y => y.UsedLeaveDays)
@@ -53,19 +48,22 @@ namespace PersonelAPI1.Controllers
             return employee;
         }
 
-        // POST: api/Employee
         [HttpPost]
-        public async Task<ActionResult<Personel>> PostEmployee(Personel employee)
+        public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
-            _context.Personeller.Add(employee);
+            _context.Employees.Add(employee);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetEmployee), new { id = employee.Id }, employee);
         }
 
-        // PUT: api/Employee/5
+        private bool EmployeeExists(int id)
+        {
+            return _context.Employees.Any(a => a.Id == id);
+        }
+
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutEmployee(int id, Personel employee)
+        public async Task<IActionResult> PutEmployee(int id, Employee employee)
         {
             if (id != employee.Id)
             {
@@ -92,32 +90,25 @@ namespace PersonelAPI1.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Employee/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var employee = await _context.Personeller.FindAsync(id);
+            var employee = await _context.Employees.FindAsync(id);
             if (employee == null)
             {
                 return NotFound();
             }
 
-            _context.Personeller.Remove(employee);
+            _context.Employees.Remove(employee);
             await _context.SaveChangesAsync();
 
             return NoContent();
         }
 
-        // GET: api/Employee/healthcheck
-        [HttpGet("healthcheck")]
-        public IActionResult HealthCheck()
+        [HttpGet("check")]
+        public IActionResult Check()
         {
             return Ok("API is running.");
-        }
-
-        private bool EmployeeExists(int id)
-        {
-            return _context.Personeller.Any(e => e.Id == id);
         }
     }
 }

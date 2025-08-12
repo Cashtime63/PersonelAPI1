@@ -1,6 +1,5 @@
-﻿using System;
+﻿using PersonelAPI1.Models;
 using System.ComponentModel.DataAnnotations.Schema;
-using PersonelAPI1.Data;
 
 namespace PersonelAPI1.Models
 {
@@ -20,7 +19,6 @@ namespace PersonelAPI1.Models
         [Column("Aciklama")]
         public string Description { get; set; }
 
-        [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
     }
 }

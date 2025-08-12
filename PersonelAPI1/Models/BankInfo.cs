@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using PersonelAPI1.Data;
+﻿using PersonelAPI1.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PersonelAPI1.Models
 {
@@ -13,9 +13,9 @@ namespace PersonelAPI1.Models
         [Column("BankaAdi")]
         public string BankName { get; set; }
 
+        [Column("IBAN")]
         public string IBAN { get; set; }
 
-        [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 
 using Microsoft.EntityFrameworkCore;
-using PersonelAPI.Models;
+using PersonelAPI1.Models;
 
 namespace PersonelAPI1
 {

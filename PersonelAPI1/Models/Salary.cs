@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using PersonelAPI1.Models;
 using System.ComponentModel.DataAnnotations.Schema;
-using PersonelAPI1.Data;
+
 namespace PersonelAPI1.Models
 {
     public class Salary
@@ -16,11 +15,12 @@ namespace PersonelAPI1.Models
 
         [Column("BrutMaas")]
         public decimal GrossSalary { get; set; }
+        [Column("Kesinti")]
+        public decimal Deduction { get; set; }
 
         [Column("MaasTarihi")]
         public DateTime SalaryDate { get; set; }
 
-        [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
 
         public ICollection<ExtraPayment> ExtraPayments { get; set; } = new List<ExtraPayment>();

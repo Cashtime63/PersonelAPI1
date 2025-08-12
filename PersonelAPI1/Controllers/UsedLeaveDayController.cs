@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace PersonelAPI1.Controllers
 {
@@ -12,20 +9,17 @@ namespace PersonelAPI1.Controllers
     public class UsedLeaveDayController : ControllerBase
     {
         private readonly EmployeeDbContext _context;
-
         public UsedLeaveDayController(EmployeeDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/UsedLeaveDay
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UsedLeaveDay>>> GetUsedLeaveDays()
         {
             return await _context.UsedLeaveDays.ToListAsync();
         }
 
-        // GET: api/UsedLeaveDay/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UsedLeaveDay>> GetUsedLeaveDay(int id)
         {
@@ -37,7 +31,6 @@ namespace PersonelAPI1.Controllers
             return leaveDay;
         }
 
-        // POST: api/UsedLeaveDay
         [HttpPost]
         public async Task<ActionResult<UsedLeaveDay>> PostUsedLeaveDay(UsedLeaveDay leaveDay)
         {
@@ -47,7 +40,6 @@ namespace PersonelAPI1.Controllers
             return CreatedAtAction(nameof(GetUsedLeaveDay), new { id = leaveDay.Id }, leaveDay);
         }
 
-        // PUT: api/UsedLeaveDay/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUsedLeaveDay(int id, UsedLeaveDay leaveDay)
         {
@@ -55,7 +47,6 @@ namespace PersonelAPI1.Controllers
             {
                 return BadRequest();
             }
-
             _context.Entry(leaveDay).State = EntityState.Modified;
 
             try
@@ -64,7 +55,7 @@ namespace PersonelAPI1.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.UsedLeaveDays.Any(e => e.Id == id))
+                if (!_context.UsedLeaveDays.Any(x => x.Id == id))
                 {
                     return NotFound();
                 }
@@ -73,23 +64,19 @@ namespace PersonelAPI1.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
-        // DELETE: api/UsedLeaveDay/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUsedLeaveDay(int id)
         {
-            var leaveDay = await _context.UsedLeaveDays.FindAsync(id);
-            if (leaveDay == null)
+            var toDelete = await _context.UsedLeaveDays.FindAsync(id);
+            if (toDelete == null)
             {
                 return NotFound();
             }
-
-            _context.UsedLeaveDays.Remove(leaveDay);
+            _context.Remove(toDelete);
             await _context.SaveChangesAsync();
-
             return NoContent();
         }
     }

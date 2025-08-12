@@ -1,6 +1,6 @@
-﻿using System;
+﻿
 using System.ComponentModel.DataAnnotations.Schema;
-using PersonelAPI1.Data;
+
 
 namespace PersonelAPI1.Models
 {

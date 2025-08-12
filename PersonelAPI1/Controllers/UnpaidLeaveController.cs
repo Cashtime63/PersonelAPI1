@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace PersonelAPI1.Controllers
 {
@@ -12,43 +9,37 @@ namespace PersonelAPI1.Controllers
     public class UnpaidLeaveController : ControllerBase
     {
         private readonly EmployeeDbContext _context;
-
         public UnpaidLeaveController(EmployeeDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/UnpaidLeave
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UnpaidLeave>>> GetUnpaidLeaves()
         {
-            var list = await _context.UnpaidLeaves.Include(p => p.Personel).ToListAsync();
+            var list = await _context.UnpaidLeaves.Include(p => p.Employee).ToListAsync();
             return list;
         }
 
-        // GET: api/UnpaidLeave/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UnpaidLeave>> GetUnpaidLeave(int id)
         {
-            var leave = await _context.UnpaidLeaves.Include(p => p.Personel).FirstOrDefaultAsync(l => l.Id == id);
-            if (leave == null)
+            var item = await _context.UnpaidLeaves.Include(b => b.Employee).FirstOrDefaultAsync(a => a.Id == id);
+            if (item == null)
             {
                 return NotFound();
             }
-            return leave;
+            return item;
         }
 
-        // POST: api/UnpaidLeave
         [HttpPost]
-        public async Task<ActionResult<UnpaidLeave>> PostUnpaidLeave(UnpaidLeave leave)
+        public async Task<ActionResult> PostUnpaidLeave(UnpaidLeave leave)
         {
             await _context.UnpaidLeaves.AddAsync(leave);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction(nameof(GetUnpaidLeave), new { id = leave.Id }, leave);
         }
 
-        // PUT: api/UnpaidLeave/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutUnpaidLeave(int id, UnpaidLeave leave)
         {
@@ -56,7 +47,6 @@ namespace PersonelAPI1.Controllers
             {
                 return BadRequest();
             }
-
             _context.Entry(leave).State = EntityState.Modified;
 
             try
@@ -65,7 +55,7 @@ namespace PersonelAPI1.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.UnpaidLeaves.Any(e => e.Id == id))
+                if (!_context.UnpaidLeaves.Any(f => f.Id == id))
                 {
                     return NotFound();
                 }
@@ -74,11 +64,9 @@ namespace PersonelAPI1.Controllers
                     throw;
                 }
             }
-
             return NoContent();
         }
 
-        // DELETE: api/UnpaidLeave/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUnpaidLeave(int id)
         {

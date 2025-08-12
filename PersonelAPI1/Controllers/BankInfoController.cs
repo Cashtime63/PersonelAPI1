@@ -1,10 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using PersonelAPI1.Data;
 
 namespace PersonelAPI1.Controllers
 {
@@ -13,24 +9,21 @@ namespace PersonelAPI1.Controllers
     public class BankInfoController : ControllerBase
     {
         private readonly EmployeeDbContext _context;
-
         public BankInfoController(EmployeeDbContext context)
         {
             _context = context;
         }
 
-        // GET: api/BankInfo
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BankInfo>>> GetBankInfos()
         {
-            return await _context.BankaBilgileri.ToListAsync();
+            return await _context.BankInfos.ToListAsync();
         }
 
-        // GET: api/BankInfo/5
         [HttpGet("{id}")]
         public async Task<ActionResult<BankInfo>> GetBankInfo(int id)
         {
-            var bankInfo = await _context.BankaBilgileri.FindAsync(id);
+            var bankInfo = await _context.BankInfos.FindAsync(id);
             if (bankInfo == null)
             {
                 return NotFound();
@@ -38,17 +31,15 @@ namespace PersonelAPI1.Controllers
             return bankInfo;
         }
 
-        // POST: api/BankInfo
         [HttpPost]
         public async Task<ActionResult<BankInfo>> PostBankInfo(BankInfo bankInfo)
         {
-            _context.BankaBilgileri.Add(bankInfo);
+            _context.BankInfos.Add(bankInfo);
             await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetBankInfo), new { id = bankInfo.Id }, bankInfo);
         }
 
-        // PUT: api/BankInfo/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBankInfo(int id, BankInfo bankInfo)
         {
@@ -78,17 +69,16 @@ namespace PersonelAPI1.Controllers
             return NoContent();
         }
 
-        // DELETE: api/BankInfo/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBankInfo(int id)
         {
-            var bankInfo = await _context.BankaBilgileri.FindAsync(id);
+            var bankInfo = await _context.BankInfos.FindAsync(id);
             if (bankInfo == null)
             {
                 return NotFound();
             }
 
-            _context.BankaBilgileri.Remove(bankInfo);
+            _context.BankInfos.Remove(bankInfo);
             await _context.SaveChangesAsync();
 
             return NoContent();
@@ -96,7 +86,7 @@ namespace PersonelAPI1.Controllers
 
         private bool BankInfoExists(int id)
         {
-            return _context.BankaBilgileri.Any(b => b.Id == id);
+            return _context.BankInfos.Any(b => b.Id == id);
         }
     }
 }

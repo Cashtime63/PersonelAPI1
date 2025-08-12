@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
 
 namespace PersonelAPI1.Controllers
 {
@@ -18,14 +15,12 @@ namespace PersonelAPI1.Controllers
             _context = context;
         }
 
-        // GET: api/Report
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Report>>> GetReports()
         {
             return await _context.Reports.ToListAsync();
         }
 
-        // GET: api/Report/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Report>> GetReport(int id)
         {
@@ -37,7 +32,6 @@ namespace PersonelAPI1.Controllers
             return report;
         }
 
-        // POST: api/Report
         [HttpPost]
         public async Task<ActionResult<Report>> PostReport(Report report)
         {
@@ -47,7 +41,6 @@ namespace PersonelAPI1.Controllers
             return CreatedAtAction(nameof(GetReport), new { id = report.Id }, report);
         }
 
-        // PUT: api/Report/5
         [HttpPut("{id}")]
         public async Task<IActionResult> PutReport(int id, Report report)
         {
@@ -77,17 +70,16 @@ namespace PersonelAPI1.Controllers
             return NoContent();
         }
 
-        // DELETE: api/Report/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReport(int id)
         {
-            var report = await _context.Reports.FindAsync(id);
-            if (report == null)
+            var reportToDelete = await _context.Reports.FindAsync(id);
+            if (reportToDelete == null)
             {
                 return NotFound();
             }
 
-            _context.Reports.Remove(report);
+            _context.Reports.Remove(reportToDelete);
             await _context.SaveChangesAsync();
 
             return NoContent();

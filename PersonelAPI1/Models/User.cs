@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using PersonelAPI1.Data;
+﻿using PersonelAPI1.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace PersonelAPI1.Models
 {
@@ -11,7 +11,7 @@ namespace PersonelAPI1.Models
         public string Username { get; set; }
 
         [Column("SifreHash")]
-        public string PasswordHash { get; set; }
+        public byte[] PasswordHash { get; set; }
 
         [Column("Rol")]
         public string Role { get; set; }
@@ -19,7 +19,6 @@ namespace PersonelAPI1.Models
         [Column("PersonelId")]
         public int EmployeeId { get; set; }
 
-        [ForeignKey("EmployeeId")]
         public Employee? Employee { get; set; }
     }
 }

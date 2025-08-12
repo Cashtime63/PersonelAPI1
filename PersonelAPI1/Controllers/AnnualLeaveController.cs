@@ -1,19 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Linq;
-using PersonelAPI1.Data;
 
 namespace PersonelAPI1.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class AnnualLeaveController : ControllerBase
     {
         private readonly EmployeeDbContext _context;
-
         public AnnualLeaveController(EmployeeDbContext context)
         {
             _context = context;
@@ -23,7 +18,7 @@ namespace PersonelAPI1.Controllers
         public async Task<ActionResult<IEnumerable<AnnualLeave>>> GetAnnualLeaves()
         {
             return await _context.AnnualLeaves
-                .Include(y => y.UsedLeaveDays)
+                .Include(al => al.UsedLeaveDays)
                 .ToListAsync();
         }
 
@@ -31,8 +26,8 @@ namespace PersonelAPI1.Controllers
         public async Task<ActionResult<AnnualLeave>> GetAnnualLeave(int id)
         {
             var annualLeave = await _context.AnnualLeaves
-                .Include(a => a.UsedLeaveDays)
-                .FirstOrDefaultAsync(x => x.Id == id);
+                .Include(al => al.UsedLeaveDays)
+                .FirstOrDefaultAsync(al => al.Id == id);
 
             if (annualLeave == null)
             {
@@ -81,19 +76,20 @@ namespace PersonelAPI1.Controllers
 
         private bool AnnualLeaveExists(int id)
         {
-            return _context.AnnualLeaves.Any(x => x.Id == id);
+            return _context.AnnualLeaves.Any(al => al.Id == id);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAnnualLeave(int id)
         {
-            var toDelete = await _context.AnnualLeaves.FindAsync(id);
-            if (toDelete == null)
+            var annualLeave = await _context.AnnualLeaves.FindAsync(id);
+
+            if (annualLeave == null)
             {
                 return NotFound();
             }
 
-            _context.AnnualLeaves.Remove(toDelete);
+            _context.AnnualLeaves.Remove(annualLeave);
             await _context.SaveChangesAsync();
 
             return NoContent();
