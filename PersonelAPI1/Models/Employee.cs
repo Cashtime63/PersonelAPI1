@@ -34,11 +34,12 @@ public class Employee
 
     public ICollection<UnpaidLeave> UnpaidLeaves { get; set; } = new List<UnpaidLeave>();
 
+    public bool IsActive { get; set; } = true;
+
     public ICollection<Report> Reports { get; set; } = new List<Report>();
 
     public ICollection<Salary> Salaries { get; set; } = new List<Salary>();
     public ICollection<Address> Addresses { get; set; } = new List<Address>();
-
 
     public User? User { get; set; }
 }

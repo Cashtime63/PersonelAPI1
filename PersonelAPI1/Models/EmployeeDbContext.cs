@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PersonelAPI1.Models;
+using PersonelAPI1.Models; // Models klasöründeyse bu namespace doğru olmalı
 
 public class EmployeeDbContext : DbContext
 {
@@ -17,13 +17,13 @@ public class EmployeeDbContext : DbContext
     public DbSet<Salary> Salaries { get; set; }
     public DbSet<ExtraPayment> ExtraPayments { get; set; }
     public DbSet<User> Users { get; set; }
-    public DbSet<Address> Addresses { get; set; } // ← EKLENDİ
-
+    public DbSet<Address> Addresses { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
+        // Tablo isimleri ile tam eşleme
         modelBuilder.Entity<Employee>().ToTable("Personel");
         modelBuilder.Entity<BankInfo>().ToTable("BankaBilgisi");
         modelBuilder.Entity<AnnualLeave>().ToTable("YillikIzin");
@@ -35,10 +35,13 @@ public class EmployeeDbContext : DbContext
         modelBuilder.Entity<User>().ToTable("Kullanici");
         modelBuilder.Entity<Address>().ToTable("Address");
 
+        // 1'e 1 ilişki: Employee - BankInfo
         modelBuilder.Entity<BankInfo>()
             .HasOne(b => b.Employee)
             .WithOne(e => e.BankInfo)
             .HasForeignKey<BankInfo>(b => b.EmployeeId);
+
+        // 1'e çok ilişkiler
 
         modelBuilder.Entity<Employee>()
             .HasMany(e => e.AnnualLeaves)

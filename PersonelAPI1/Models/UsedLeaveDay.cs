@@ -1,6 +1,5 @@
-﻿
+﻿using PersonelAPI1.Models;
 using System.ComponentModel.DataAnnotations.Schema;
-
 
 namespace PersonelAPI1.Models
 {
@@ -14,7 +13,6 @@ namespace PersonelAPI1.Models
         [Column("Tarih")]
         public DateTime Date { get; set; }
 
-        [ForeignKey("AnnualLeaveId")]
         public AnnualLeave? AnnualLeave { get; set; }
     }
 }

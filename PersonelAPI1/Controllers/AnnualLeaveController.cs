@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PersonelAPI1.Models;
 
 namespace PersonelAPI1.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class AnnualLeaveController : ControllerBase
@@ -15,14 +17,28 @@ namespace PersonelAPI1.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Employee")]
         public async Task<ActionResult<IEnumerable<AnnualLeave>>> GetAnnualLeaves()
         {
+            var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (userRole == "Employee" && int.TryParse(userIdClaim, out int userId))
+            {
+                return await _context.AnnualLeaves
+                    .Include(al => al.UsedLeaveDays)
+                    .Where(al => al.EmployeeId == userId)
+                    .ToListAsync();
+            }
+
+            // Admin tüm kayıtları görebilir
             return await _context.AnnualLeaves
                 .Include(al => al.UsedLeaveDays)
                 .ToListAsync();
         }
 
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin,Employee")]
         public async Task<ActionResult<AnnualLeave>> GetAnnualLeave(int id)
         {
             var annualLeave = await _context.AnnualLeaves
@@ -33,10 +49,20 @@ namespace PersonelAPI1.Controllers
             {
                 return NotFound();
             }
+
+            var userRole = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userRole == "Employee" && int.TryParse(userIdClaim, out int userId))
+            {
+                if (annualLeave.EmployeeId != userId)
+                    return Forbid();
+            }
+
             return annualLeave;
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<AnnualLeave>> PostAnnualLeave(AnnualLeave annualLeave)
         {
             _context.AnnualLeaves.Add(annualLeave);
@@ -46,6 +72,7 @@ namespace PersonelAPI1.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> PutAnnualLeave(int id, AnnualLeave annualLeave)
         {
             if (id != annualLeave.Id)
@@ -74,12 +101,8 @@ namespace PersonelAPI1.Controllers
             return NoContent();
         }
 
-        private bool AnnualLeaveExists(int id)
-        {
-            return _context.AnnualLeaves.Any(al => al.Id == id);
-        }
-
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAnnualLeave(int id)
         {
             var annualLeave = await _context.AnnualLeaves.FindAsync(id);
@@ -93,6 +116,11 @@ namespace PersonelAPI1.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
+        }
+
+        private bool AnnualLeaveExists(int id)
+        {
+            return _context.AnnualLeaves.Any(al => al.Id == id);
         }
     }
 }
