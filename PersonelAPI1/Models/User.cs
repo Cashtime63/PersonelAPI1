@@ -18,7 +18,9 @@ namespace PersonelAPI1.Models
 
         [Column("PersonelId")]
         public int EmployeeId { get; set; }
+        [ForeignKey("EmployeeId")]
 
         public Employee? Employee { get; set; }
+
     }
 }
