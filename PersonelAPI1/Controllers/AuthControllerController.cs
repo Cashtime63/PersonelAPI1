@@ -71,13 +71,25 @@ namespace PersonelAPI1.Controllers
             if (await _context.Users.AnyAsync(u => u.Username == request.Username))
                 return BadRequest("Bu kullanıcı zaten mevcut.");
 
+            if (request.PersonelId.HasValue)
+            {
+                var employeeExists = await _context.Employees.AnyAsync(e => e.Id == request.PersonelId.Value);
+                if (!employeeExists)
+                    return BadRequest($"PersonelId {request.PersonelId} bulunamadı.");
+
+                var existingUser = await _context.Users.AnyAsync(u => u.EmployeeId == request.PersonelId.Value);
+                if (existingUser)
+                    return BadRequest($"Bu personele ({request.PersonelId}) zaten bir kullanıcı atanmış.");
+            }
+
             var passwordHash = ComputeHash(request.Password);
 
             var newUser = new User
             {
                 Username = request.Username,
                 PasswordHash = passwordHash,
-                Role = request.Role
+                Role = request.Role,
+                EmployeeId = request.PersonelId ?? 0
             };
 
             _context.Users.Add(newUser);
@@ -104,6 +116,6 @@ namespace PersonelAPI1.Controllers
         public string Username { get; set; }
         public string Password { get; set; }
         public string Role { get; set; }
+        public int? PersonelId { get; set; }
     }
 }
-
