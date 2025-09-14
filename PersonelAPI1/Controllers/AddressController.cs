@@ -11,43 +11,54 @@ namespace PersonelAPI1.Controllers
     public class AddressController : ControllerBase
     {
         private readonly EmployeeDbContext _context;
+        private readonly ILogger<AddressController> _logger;
 
-        public AddressController(EmployeeDbContext context)
+        public AddressController(EmployeeDbContext context, ILogger<AddressController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Address>>> GetAddresses()
         {
-            // Admin tüm adresleri görebilir
-            return await _context.Addresses.ToListAsync();
+            try
+            {
+                return await _context.Addresses.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving addresses");
+                return StatusCode(500, "Bir hata oluştu");
+            }
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Employee")]
         public async Task<ActionResult<Address>> GetAddress(int id)
         {
-            var address = await _context.Addresses.FindAsync(id);
-
-            if (address == null)
-                return NotFound();
-
-            if (User.IsInRole("Employee"))
+            try
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var address = await _context.Addresses.FindAsync(id);
+                if (address == null)
+                    return NotFound();
 
-                // Employee sadece kendi adreslerine erişebilir
-                var employee = await _context.Employees
-                    .Include(e => e.Addresses)
-                    .FirstOrDefaultAsync(e => e.User.Id == userId);
+                if (User.IsInRole("Employee"))
+                {
+                    var employeeId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-                if (employee == null || !employee.Addresses.Any(a => a.Id == id))
-                    return Forbid();
+                    if (address.EmployeeId != employeeId)
+                        return Forbid();
+                }
+
+                return address;
             }
-
-            return address;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving address");
+                return StatusCode(500, "Bir hata oluştu");
+            }
         }
 
         [HttpPost]
@@ -56,7 +67,6 @@ namespace PersonelAPI1.Controllers
         {
             _context.Addresses.Add(address);
             await _context.SaveChangesAsync();
-
             return CreatedAtAction(nameof(GetAddress), new { id = address.Id }, address);
         }
 
@@ -69,13 +79,10 @@ namespace PersonelAPI1.Controllers
 
             if (User.IsInRole("Employee"))
             {
-                var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var employeeId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+                var existingAddress = await _context.Addresses.FindAsync(id);
 
-                var employee = await _context.Employees
-                    .Include(e => e.Addresses)
-                    .FirstOrDefaultAsync(e => e.User.Id == userId);
-
-                if (employee == null || !employee.Addresses.Any(a => a.Id == id))
+                if (existingAddress == null || existingAddress.EmployeeId != employeeId)
                     return Forbid();
             }
 
